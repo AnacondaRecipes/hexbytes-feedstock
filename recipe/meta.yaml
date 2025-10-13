@@ -24,6 +24,10 @@ requirements:
   run:
     - python
 
+{% set ignore_tests = "" %}
+# Skip following tests for PY3.13 because eth-utils is missing for PY3.13
+{% set ignore_tests = ignore_tests + " --ignore=tests/core/test_hexbytes.py" %}  # [py==313]
+
 test:
   source_files:
     - tests
@@ -32,11 +36,11 @@ test:
   commands:
     - pip check
     - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
-    - pytest -v tests
+    - pytest -v tests {{ ignore_tests }}
   requires:
     - pip
     - pytest >=7.0.0
-    - eth-utils >=2.0.0
+    - eth-utils >=2.0.0  # [py<313]
     - hypothesis >=3.44.24
 
 about:
