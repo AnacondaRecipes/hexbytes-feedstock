@@ -1,5 +1,5 @@
 {% set name = "hexbytes" %}
-{% set version = "0.3.0" %}
+{% set version = "1.3.1" %}
 
 
 package:
@@ -8,33 +8,46 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: afeebfb800f5f15a3ca5bab52e49eabcb4b6dac06ec8ff01a94fdb890c6c0712
+  sha256: a657eebebdfe27254336f98d8af6e2236f3f83aed164b87466b6cf6c5f5a4765
 
 build:
   number: 0
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
+  script: {{ PYTHON }} -m pip install . --no-deps --no-build-isolation -vv
+  skip: true  # [py<38]
 
 requirements:
   host:
     - pip
-    - python >=3.6,<4.0
+    - python
+    - setuptools
+    - wheel
   run:
-    - python >=3.6,<4.0
+    - python
 
 test:
+  source_files:
+    - tests
   imports:
     - hexbytes
   commands:
     - pip check
+    - python -c "from importlib.metadata import version; assert(version('{{ name }}')=='{{ version }}')"
+    - pytest -v tests
   requires:
     - pip
+    - pytest >=7.0.0
+    - eth-utils >=2.0.0
+    - hypothesis >=3.44.24
 
 about:
   home: https://github.com/ethereum/hexbytes
-  summary: 'hexbytes: Python `bytes` subclass that decodes hex, with a readable console output'
+  summary: Python bytes subclass that decodes hex, with a readable console output
+  description: Python bytes subclass that decodes hex, with a readable console output
   license: MIT
+  license_family: MIT
   license_file: LICENSE
+  dev_url: https://github.com/ethereum/hexbytes
+  doc_url: https://hexbytes.readthedocs.io
 
 extra:
   recipe-maintainers:
